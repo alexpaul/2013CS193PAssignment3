@@ -7,7 +7,7 @@
 //
 
 #import "CardGameViewController.h"
-#import "PlayingCardDeck.h"
+//#import "PlayingCardDeck.h"
 #import "CardMatchingGame.h"
 #import "GameResults.h"
 #import "SettingsViewController.h"
@@ -20,9 +20,10 @@
 @property (weak, nonatomic) IBOutlet UILabel *resultsLabel;
 @property (weak, nonatomic) IBOutlet UISwitch *cardMatchingModeSwitch;
 @property (weak, nonatomic) IBOutlet UISlider *historySlider;
-@property (nonatomic) int cardMatchMode;
+//@property (nonatomic) int cardMatchMode;
 @property (nonatomic, strong) SettingsViewController *settings; 
 @property (weak, nonatomic) IBOutlet UICollectionView *cardCollectionView;
+@property (nonatomic) int visibleCellsCount;
 
 //  Game Results
 @property (nonatomic, strong) GameResults *gameResult; 
@@ -40,12 +41,26 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return self.startingCardCount; // in the homework you will want to ask the game how many cards are currently in play
+    //return self.startingCardCount; // in the homework you will want to ask the game how many cards are currently in play
+    
+    if ([[self.cardCollectionView visibleCells] count] == 0) {
+        return self.startingCardCount;
+    }else{
+        NSLog(@"There are %d cards in play.", [[self.game allCardsInPlay] count]);
+        return [[self.game allCardsInPlay] count];
+    }    
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"PlayingCard" forIndexPath:indexPath];
+    NSString *CellIdentifier;
+    if ([self.tabBarItem.title isEqualToString:@"Match"]) {
+        CellIdentifier = @"PlayingCard";
+    }else{
+        CellIdentifier = @"SetCard"; 
+    }
+    
+    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:CellIdentifier forIndexPath:indexPath]; //PlayingCard, SetCard
     Card *card = [self.game cardAtIndex:indexPath.item];
     [self updateCell:cell usingCard:card animate:NO];
     
@@ -61,8 +76,8 @@
 {
     [super viewWillAppear:YES];
     
-    //self.cardMatchingModeSwitch.on = NO;
-        
+    self.visibleCellsCount = [[self.cardCollectionView visibleCells] count]; 
+            
     self.historySlider.minimumValue = 0;
     self.historySlider.continuous = YES; 
     
@@ -86,12 +101,9 @@
 }
 
 - (CardMatchingGame *)game
-{
-    self.cardMatchMode = (self.cardMatchingModeSwitch.on) ? 3 : 2;
-    //self.cardMatchMode = (self.settings.gameModeSwitch.on) ? 3 : 2;
-    
+{    
     if (!_game) {
-        _game = [[CardMatchingGame alloc] initWithCardCount:self.startingCardCount usingDeck:[self createDeck] cardMatchMode:self.cardMatchMode];
+        _game = [[CardMatchingGame alloc] initWithCardCount:12 usingDeck:[self createDeck] cardMatchMode:self.cardMatchingMode];
     }
     return _game; 
 }
@@ -100,6 +112,8 @@
 
 - (void)updateUI
 {
+    NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
+    
     for (UICollectionViewCell *cell in [self.cardCollectionView visibleCells]) {
         NSIndexPath *indexPath = [self.cardCollectionView indexPathForCell:cell];
         Card *card = [self.game cardAtIndex:indexPath.item];
@@ -109,19 +123,23 @@
         }else{
             [self updateCell:cell usingCard:card animate:NO];
         }
+        
+        if (card.isUnplayable && card.isFaceUp) {
+            if ([self.tabBarItem.title isEqualToString:@"Set"]) {
+                [indexPaths addObject:indexPath];
+            }
+        }
     }
-    
-    /*
-    self.resultsLabel.textColor = [UIColor blackColor];
-    self.resultsLabel.text = self.game.resultsString;
-    
-    if (self.game.resultsString != nil) {
-        //  Save results match to flipsArray  
-        [self.flipsHistoryArray addObject:self.game.resultsString];
+    if ([indexPaths count] != 0) {
+        [self.cardCollectionView performBatchUpdates:^(void){
+            for (NSIndexPath *indexPath in indexPaths) {
+                Card *card = [self.game cardAtIndex:indexPath.item];
+                [self.game removeCardFromGame:card]; // from dataSource
+            }
+            [self.cardCollectionView deleteItemsAtIndexPaths:indexPaths]; // from View
+            [indexPaths removeAllObjects];
+        }completion:nil];
     }
-    
-    //  Set maximum value of slider
-    self.historySlider.maximumValue = [self.flipsHistoryArray count];*/
 }
 
 - (void)setFlipsCount:(int)flipsCount
@@ -138,9 +156,7 @@
 
 //  Gesture handler for the tap
 - (IBAction)flipCard:(UIGestureRecognizer *)gesture
-{
-    //self.cardMatchingModeSwitch.enabled = NO;
-    
+{    
     //  Location of the tap in the collection coordinate system
     CGPoint tapLocation = [gesture locationInView:self.cardCollectionView];
     
@@ -150,9 +166,9 @@
     //  Check that indexPath does indeed have a value and the tap was not on an empty space in the collection view
     if (indexPath) {        
         if ([self.tabBarItem.title isEqualToString:@"Match"]) {
-            [self.game flipCardAtIndex:indexPath.item];
-        }else{
-            //[self.game setCardAtIndex:index];
+            [self.game flipCardAtIndex:indexPath.item]; // Flips the card if it's a PlayingCard
+        }else{ // Sets the Card if it's a SetCard
+            [self.game playSetCardAtIndex:indexPath.item];
         }
         self.flipsCount++;
         [self updateUI];
@@ -161,34 +177,27 @@
 
 - (IBAction)dealNewDeck:(UIButton *)sender
 {
-    //self.cardMatchingModeSwitch.enabled = YES;
-    
-    //self.cardMatchMode = (self.settings.gameModeSwitch.on) ? 3 : 2;
-        
-    NSLog(@"card match mode is %d", self.cardMatchMode);
+    NSLog(@"card match mode is %d", self.cardMatchingMode);
         
     self.game = nil;
     
     self.gameResult = nil; 
     
     [self updateUI];
-    
+        
     self.flipsCount = 0;
     
     self.resultsLabel.textColor = [UIColor blackColor];
     
     self.resultsLabel.text = @"New Game";
+    
+    self.visibleCellsCount = 0;
 
 }
 
 - (IBAction)cardMatchingMode:(UISwitch *)sender
-{
-    self.cardMatchMode = (sender.on) ? 3 : 2;
-    
+{    
     [self dealNewDeck:nil]; 
-    
-    NSLog(@"card match mode is %d", self.cardMatchMode);
-
 }
 
 - (IBAction)showFlipHistory:(UISlider *)sender

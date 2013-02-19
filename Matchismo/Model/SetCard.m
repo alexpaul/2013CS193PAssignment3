@@ -13,31 +13,31 @@
 
 @implementation SetCard
 
-+ (NSArray *)validCharacters
++ (NSArray *)validShapes
 {
-    return @[@"▲", @"■", @"●"]; // @"▲", @"■", @"●"
+    return @[@"Squiggle", @"Diamond", @"Oval"]; // @"▲", @"■", @"●"
 }
 
 + (NSArray *)validColors
 {
-    return @[[UIColor redColor],[UIColor greenColor],[UIColor blueColor]]; // [UIColor redColor],[UIColor greenColor],[UIColor blueColor]
+    return @[[UIColor redColor],[UIColor greenColor],[UIColor purpleColor]]; // [UIColor redColor],[UIColor greenColor],[UIColor blueColor]
 }
 
 + (NSArray *)validShading
 {
-    return @[@"no fill", @"fill", @"light shade"]; 
+    return @[@"Unfill", @"Solid", @"Striped"]; 
 }
 
-- (void)setNumberOfSymbols:(NSUInteger)numberOfSymbols
+- (void)number:(NSUInteger)number
 {
-    if (numberOfSymbols <= 3) {
-        _numberOfSymbols = numberOfSymbols;
+    if (number <= 3) {
+        _number = number;
     }
 }
 
 - (NSString *)contents
 {
-    return [NSString stringWithFormat:@"%@, %@, %@, %d", self.symbol, self.shading, self.color, self.numberOfSymbols];
+    return [NSString stringWithFormat:@"%@, %@, %@, %d", self.shape, self.shade, self.color, self.number];
 }
 
 - (int)match:(NSArray *)otherCards
@@ -59,23 +59,23 @@
         
         BOOL isNOTASet;
         
-        if (((self.numberOfSymbols == otherCard1.numberOfSymbols) && (self.numberOfSymbols != otherCard2.numberOfSymbols)) ||
-            ((self.numberOfSymbols == otherCard2.numberOfSymbols) && (self.numberOfSymbols != otherCard1.numberOfSymbols))||
-            ((otherCard1.numberOfSymbols == otherCard2.numberOfSymbols) && (self.numberOfSymbols != otherCard1.numberOfSymbols)))
+        if (((self.number == otherCard1.number) && (self.number != otherCard2.number)) ||
+            ((self.number == otherCard2.number) && (self.number != otherCard1.number))||
+            ((otherCard1.number == otherCard2.number) && (self.number != otherCard1.number)))
         {
             isNOTASet = YES;
             NSLog(@"number mismatch");
         }
-        else if (([self.symbol isEqualToString:otherCard1.symbol] && !([self.symbol isEqualToString:otherCard2.symbol])) ||
-                 ([self.symbol isEqualToString:otherCard2.symbol] && !([self.symbol isEqualToString:otherCard1.symbol])) ||
-                  ([otherCard1.symbol isEqualToString:otherCard2.symbol] && !([self.symbol isEqualToString:otherCard1.symbol])))
+        else if (([self.shape isEqualToString:otherCard1.shape] && !([self.shape isEqualToString:otherCard2.shape])) ||
+                 ([self.shape isEqualToString:otherCard2.shape] && !([self.shape isEqualToString:otherCard1.shape])) ||
+                  ([otherCard1.shape isEqualToString:otherCard2.shape] && !([self.shape isEqualToString:otherCard1.shape])))
         {
             isNOTASet = YES;
             NSLog(@"symbol mismatch");
         }
-        else if (([self.shading isEqualToString:otherCard1.shading] && !([self.shading isEqualToString:otherCard2.shading]))||
-                 ([self.shading isEqualToString:otherCard2.shading] && !([self.shading isEqualToString:otherCard1.shading])) ||
-                 ([otherCard1.shading isEqualToString:otherCard2.shading] && !([self.shading isEqualToString:otherCard1.shading])))
+        else if (([self.shade isEqualToString:otherCard1.shade] && !([self.shade isEqualToString:otherCard2.shade]))||
+                 ([self.shade isEqualToString:otherCard2.shade] && !([self.shade isEqualToString:otherCard1.shade])) ||
+                 ([otherCard1.shade isEqualToString:otherCard2.shade] && !([self.shade isEqualToString:otherCard1.shade])))
         {
             isNOTASet = YES;
             NSLog(@"shading mismatch");

@@ -16,16 +16,16 @@
     self = [super init];
             
     if (self) {
-        for (NSString *symbol in [SetCard validCharacters]) {
+        for (NSString *shape in [SetCard validShapes]) {
             for (UIColor *color in [SetCard validColors]) {
-                for (NSString *shading in [SetCard validShading]) {
+                for (NSString *shade in [SetCard validShading]) {
                     for (int i = 1; i <= 3; i++) {
                         // Create 3 cards with 1, 2 and 3 symbols respectively
                         SetCard *card = [[SetCard alloc] init];
-                        card.symbol = symbol;
+                        card.shape = shape;
                         card.color = color;
-                        card.shading = shading; 
-                        card.numberOfSymbols = i;
+                        card.shade = shade;
+                        card.number = i;
                         [self addCard:card atTop:NO];                         
                     }
                 }

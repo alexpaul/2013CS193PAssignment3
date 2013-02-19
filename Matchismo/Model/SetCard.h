@@ -10,13 +10,13 @@
 
 @interface SetCard : Card
 
-@property (nonatomic, strong) UIColor *color; // of symbol on card (red, green or blue)
-@property (nonatomic) NSUInteger numberOfSymbols; // of symbols on card (one, two or three)
-@property (nonatomic, strong) NSString *symbol; // (triangle, circle or square)
-@property (nonatomic, strong) NSString *shading; // (fill, no fill or dots)
+@property (nonatomic, strong) UIColor *color; // of symbol on card (red, green or purple)
+@property (nonatomic) NSUInteger number; // of symbols on card (one, two or three)
+@property (nonatomic, strong) NSString *shape; // (squiggle, diamond or oval)
+@property (nonatomic, strong) NSString *shade; // (solid, unfill or stiped)
 
-+ (NSArray *)validCharacters; // (triangle, circle, square)
++ (NSArray *)validShapes; // (diamond, oval, squiggle)
 + (NSArray *)validColors; // (red, blue, green)
-+ (NSArray *)validShading; // (no fill, fill, light shade)
++ (NSArray *)validShading; // (solid, unfill, striped)
 
 @end

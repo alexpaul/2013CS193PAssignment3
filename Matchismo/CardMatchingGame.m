@@ -30,6 +30,12 @@
 #define MISMATCH_PENALTY 2
 #define FLIP_COST 1 
 
+- (NSMutableArray *)allCardsInPlay
+{
+    NSMutableArray *allCards = [[NSMutableArray alloc] initWithArray:self.cards];
+    return allCards;
+}
+
 - (NSMutableArray *)cards
 {
     if (!_cards) {
@@ -70,12 +76,25 @@
     return (index < [self.cards count]) ? self.cards[index] : nil;
 }
 
+- (void)removeCardFromGame:(Card *)card
+{
+    NSLog(@"There are %d cards.", [self.cards count]);
+    
+    if ([card isKindOfClass:[SetCard class]]) {
+        SetCard *setCard = (SetCard *)card;
+        NSLog(@"%@ %@ with %d shapes is getting deleted.",setCard.shade, setCard.shape, setCard.number);
+        [self.cards removeObject:card];
+    }
+            
+    NSLog(@"After deletion there are %d cards", [self.cards count]);  
+}
+
 - (void)flipCardAtIndex:(NSUInteger)index
 {
     
     Card *card = [self cardAtIndex:index];
     
-    NSLog(@"flips remaining %d", self.flipsRemaining);
+    //NSLog(@"flips remaining %d", self.flipsRemaining);
     
     if (card && !card.isUnplayable) {
         if (!card.isFaceUp) {
@@ -162,18 +181,16 @@
     }
 }
 
-- (void)setCardAtIndex:(NSUInteger)index
+- (void)playSetCardAtIndex:(NSUInteger)index
 {
-    
     SetCard *card = (SetCard *)[self cardAtIndex:index];
-    
-    NSLog(@"flips remaining %d", self.flipsRemaining);
     
     if (card && !card.isUnplayable) {
         if (!card.isFaceUp) {
             for (Card *otherCard in self.cards) {
                 if (otherCard.isFaceUp && !otherCard.isUnplayable && (self.flipsRemaining == 1)) {
-                    self.flipsRemaining = self.cardMatchMode;                    
+                    self.flipsRemaining = self.cardMatchMode;
+                    NSLog(@"there are %d setcards in the array.", [self.holdCardsForMatching count]); 
                     int matchScore = [card match:[NSArray arrayWithArray:self.holdCardsForMatching]];
                     
                     if (matchScore) {
@@ -204,9 +221,10 @@
         
         
         if (card.faceUp && !card.isUnplayable) {
-            NSLog(@"inside hold for matching.");
+            NSLog(@"Saving card for matching.....");
             [self.holdCardsForMatching addObject:card];
             self.flipsRemaining--;
+            NSLog(@"flips remaining %d", self.flipsRemaining);
         }
     }
 }

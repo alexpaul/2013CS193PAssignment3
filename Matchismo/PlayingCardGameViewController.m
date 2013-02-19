@@ -13,9 +13,15 @@
 
 @implementation PlayingCardGameViewController
 
+
 - (NSUInteger)startingCardCount
 {
-    return 20; 
+    return 22;
+}
+
+- (NSUInteger)cardMatchingMode
+{
+    return 2; 
 }
 
 - (Deck *)createDeck

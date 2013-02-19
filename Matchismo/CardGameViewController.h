@@ -12,10 +12,8 @@
 @interface CardGameViewController : UIViewController
 
 @property (nonatomic) NSUInteger startingCardCount; // abstract
+@property (nonatomic) NSUInteger cardMatchingMode; // abstract
 - (Deck *)createDeck; // abstract
 - (void)updateCell:(UICollectionViewCell *)cell usingCard:(Card *)card animate:(BOOL)animate; // abstract
-
-//  Public Methods so SetGameViewController can override (Best Practices - methods that could be overriden should be part of the API)
-- (void)updateUI;
 
 @end
