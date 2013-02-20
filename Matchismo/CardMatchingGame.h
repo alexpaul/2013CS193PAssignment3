@@ -12,8 +12,6 @@
 
 @interface CardMatchingGame : NSObject
 
-- (NSMutableArray *)allCardsInPlay;
-
 //  Designated Initializer 
 - (id)initWithCardCount:(NSUInteger)count usingDeck:(Deck *)deck cardMatchMode:(NSUInteger)mode;
 
@@ -21,6 +19,9 @@
 - (void)playSetCardAtIndex:(NSUInteger)index;
 - (Card *)cardAtIndex:(NSUInteger)index;
 - (void)removeCardFromGame:(Card *)card;
+- (NSMutableArray *)allCardsInPlay;
+- (Card *)drawCardFromCurrentDeck;
+- (void)addCardToCurrentGamePlay:(Card *)card;
 
 @property (nonatomic, readonly) int score;
 @property (nonatomic, copy) NSString *resultsString;

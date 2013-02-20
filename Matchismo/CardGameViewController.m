@@ -34,21 +34,20 @@
 
 @implementation CardGameViewController
 
+#define DRAW_CARDS 3
+
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
     return 1; 
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
-    //return self.startingCardCount; // in the homework you will want to ask the game how many cards are currently in play
-    
+{    
     if ([[self.cardCollectionView visibleCells] count] == 0) {
         return self.startingCardCount;
     }else{
-        NSLog(@"There are %d cards in play.", [[self.game allCardsInPlay] count]);
-        return [[self.game allCardsInPlay] count];
-    }    
+        return [[self.game allCardsInPlay] count]; // cards currently in play
+    }     
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -75,7 +74,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:YES];
-    
+        
     self.visibleCellsCount = [[self.cardCollectionView visibleCells] count]; 
             
     self.historySlider.minimumValue = 0;
@@ -111,9 +110,7 @@
 - (Deck *)createDeck {return nil;} // abstract 
 
 - (void)updateUI
-{
-    NSMutableArray *indexPaths = [[NSMutableArray alloc] init];
-    
+{    
     for (UICollectionViewCell *cell in [self.cardCollectionView visibleCells]) {
         NSIndexPath *indexPath = [self.cardCollectionView indexPathForCell:cell];
         Card *card = [self.game cardAtIndex:indexPath.item];
@@ -126,19 +123,10 @@
         
         if (card.isUnplayable && card.isFaceUp) {
             if ([self.tabBarItem.title isEqualToString:@"Set"]) {
-                [indexPaths addObject:indexPath];
+                [self.game removeCardFromGame:card]; // from DataSource 
+                [self.cardCollectionView deleteItemsAtIndexPaths:@[indexPath]]; // from View
             }
         }
-    }
-    if ([indexPaths count] != 0) {
-        [self.cardCollectionView performBatchUpdates:^(void){
-            for (NSIndexPath *indexPath in indexPaths) {
-                Card *card = [self.game cardAtIndex:indexPath.item];
-                [self.game removeCardFromGame:card]; // from dataSource
-            }
-            [self.cardCollectionView deleteItemsAtIndexPaths:indexPaths]; // from View
-            [indexPaths removeAllObjects];
-        }completion:nil];
     }
 }
 
@@ -176,23 +164,16 @@
 }
 
 - (IBAction)dealNewDeck:(UIButton *)sender
-{
-    NSLog(@"card match mode is %d", self.cardMatchingMode);
-        
+{        
     self.game = nil;
     
-    self.gameResult = nil; 
-    
-    [self updateUI];
-        
-    self.flipsCount = 0;
+    self.gameResult = nil;
     
     self.resultsLabel.textColor = [UIColor blackColor];
     
-    self.resultsLabel.text = @"New Game";
-    
     self.visibleCellsCount = 0;
-
+        
+    [self updateUI];
 }
 
 - (IBAction)cardMatchingMode:(UISwitch *)sender
@@ -211,5 +192,25 @@
         self.resultsLabel.text = self.flipsHistoryArray[(int)sender.value];
     }
 }
+
+
+- (IBAction)draw3CardsFromCurrentDeck:(UIButton *)sender
+{
+    for (int i = 0; i < DRAW_CARDS; i++) {
+        Card *card = [self.game drawCardFromCurrentDeck];
+        if (card) {
+            // Insert card in Model
+            [self.game addCardToCurrentGamePlay:card];
+            
+            // Insert card in View (UICollectionView)
+            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:[[self.cardCollectionView visibleCells] count] inSection:0];
+            [self.cardCollectionView insertItemsAtIndexPaths:@[indexPath]];
+        }else{
+            NSLog(@"No More Cards!"); 
+            break; 
+        }
+    }
+}
+
 
 @end
