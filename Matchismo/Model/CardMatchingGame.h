@@ -22,6 +22,7 @@
 - (NSMutableArray *)allCardsInPlay;
 - (Card *)drawCardFromCurrentDeck;
 - (void)addCardToCurrentGamePlay:(Card *)card;
+- (void)possibleSetsInCurrentGamePlay; 
 
 @property (nonatomic, readonly) int score;
 @property (nonatomic, copy) NSString *resultsString;

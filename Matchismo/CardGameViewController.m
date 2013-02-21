@@ -23,7 +23,6 @@
 //@property (nonatomic) int cardMatchMode;
 @property (nonatomic, strong) SettingsViewController *settings; 
 @property (weak, nonatomic) IBOutlet UICollectionView *cardCollectionView;
-@property (nonatomic) int visibleCellsCount;
 
 //  Game Results
 @property (nonatomic, strong) GameResults *gameResult; 
@@ -74,13 +73,15 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:YES];
-        
-    self.visibleCellsCount = [[self.cardCollectionView visibleCells] count]; 
-            
+
     self.historySlider.minimumValue = 0;
     self.historySlider.continuous = YES; 
     
     self.flipsHistoryArray = [[NSMutableArray alloc] init];
+    
+    if ([self.tabBarItem.title isEqualToString:@"Set"]) {
+        [self.game possibleSetsInCurrentGamePlay];
+    }
 }
 
 - (SettingsViewController *)settings
@@ -169,11 +170,9 @@
     
     self.gameResult = nil;
     
-    self.resultsLabel.textColor = [UIColor blackColor];
-    
-    self.visibleCellsCount = 0;
-        
-    [self updateUI];
+    self.scoreLabel.text = [NSString stringWithFormat:@"Score: 0"];
+                    
+    [self.cardCollectionView reloadData];
 }
 
 - (IBAction)cardMatchingMode:(UISwitch *)sender
@@ -205,6 +204,7 @@
             // Insert card in View (UICollectionView)
             NSIndexPath *indexPath = [NSIndexPath indexPathForItem:[[self.cardCollectionView visibleCells] count] inSection:0];
             [self.cardCollectionView insertItemsAtIndexPaths:@[indexPath]];
+            [self.cardCollectionView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionBottom animated:YES];
         }else{
             NSLog(@"No More Cards!"); 
             break; 

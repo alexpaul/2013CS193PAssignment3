@@ -43,9 +43,7 @@
 - (int)match:(NSArray *)otherCards
 {
     int score = 0;
-    
-    NSLog(@"inside match: SetCard"); 
-    
+        
     //  Set Card Game Rules: 
     //  They all have the same number, or they have three different numbers. (number)
     //  They all have the same symbol, or they have three different symbols. (symbol)
@@ -64,34 +62,29 @@
             ((otherCard1.number == otherCard2.number) && (self.number != otherCard1.number)))
         {
             isNOTASet = YES;
-            NSLog(@"number mismatch");
         }
         else if (([self.shape isEqualToString:otherCard1.shape] && !([self.shape isEqualToString:otherCard2.shape])) ||
                  ([self.shape isEqualToString:otherCard2.shape] && !([self.shape isEqualToString:otherCard1.shape])) ||
                   ([otherCard1.shape isEqualToString:otherCard2.shape] && !([self.shape isEqualToString:otherCard1.shape])))
         {
             isNOTASet = YES;
-            NSLog(@"symbol mismatch");
         }
         else if (([self.shade isEqualToString:otherCard1.shade] && !([self.shade isEqualToString:otherCard2.shade]))||
                  ([self.shade isEqualToString:otherCard2.shade] && !([self.shade isEqualToString:otherCard1.shade])) ||
                  ([otherCard1.shade isEqualToString:otherCard2.shade] && !([self.shade isEqualToString:otherCard1.shade])))
         {
             isNOTASet = YES;
-            NSLog(@"shading mismatch");
         }
         else if (((self.color == otherCard1.color) && (self.color != otherCard2.color))||
                  ((self.color == otherCard2.color) && (self.color != otherCard1.color)) ||
                  ((otherCard1.color == otherCard2.color) && (self.color != otherCard1.color)))
         {
             isNOTASet = YES;
-            NSLog(@"color mismatch");
         }
         
         if (isNOTASet == YES) {
-            NSLog(@"SET NOT Found!");
+            score = 0; 
         }else{
-            NSLog(@"SET Found!");
             score = 3;
         }
     }
