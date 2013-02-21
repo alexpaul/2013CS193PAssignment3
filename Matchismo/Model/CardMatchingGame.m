@@ -44,13 +44,13 @@
 }
 
 - (void)possibleSetsInCurrentGamePlay
-{
-    for (Card *card in self.cards) {
+{    
+    for (int cardIndex = 0; cardIndex <= [self.cards count]-3; cardIndex++) {
         for (int otherCard1Index = 1; otherCard1Index <= [self.cards count]-2; otherCard1Index++) {
             for (int otherCard2Index = 2; otherCard2Index <= [self.cards count]-1; otherCard2Index++) { //??????
-                int match = [card match:@[[self cardAtIndex:otherCard1Index], [self cardAtIndex:otherCard2Index]]];
+                int match = [[self cardAtIndex:cardIndex] match:@[[self cardAtIndex:otherCard1Index], [self cardAtIndex:otherCard2Index]]];
                 if (match != 0) NSLog(@"SET FOUND");
-                //NSLog(@"Card %@, Other1%@, Other2%@", card.contents, [self cardAtIndex:otherCard1Index].contents, [self cardAtIndex:otherCard2Index].contents);
+                //NSLog(@"Card %@, Other1%@, Other2%@", [self cardAtIndex:cardIndex].contents, [self cardAtIndex:otherCard1Index].contents, [self cardAtIndex:otherCard2Index].contents);
             }
         }
     }

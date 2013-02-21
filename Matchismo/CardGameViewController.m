@@ -103,7 +103,7 @@
 - (CardMatchingGame *)game
 {    
     if (!_game) {
-        _game = [[CardMatchingGame alloc] initWithCardCount:12 usingDeck:[self createDeck] cardMatchMode:self.cardMatchingMode];
+        _game = [[CardMatchingGame alloc] initWithCardCount:self.startingCardCount usingDeck:[self createDeck] cardMatchMode:self.cardMatchingMode];
     }
     return _game; 
 }
