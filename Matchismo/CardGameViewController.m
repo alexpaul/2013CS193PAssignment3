@@ -79,6 +79,11 @@
     
     self.flipsHistoryArray = [[NSMutableArray alloc] init];
     
+    [self checkForPossibleSets];
+}
+
+- (void)checkForPossibleSets
+{
     if ([self.tabBarItem.title isEqualToString:@"Set"]) {
         [self.game possibleSetsInCurrentGamePlay];
     }
@@ -129,6 +134,7 @@
             }
         }
     }
+    [self checkForPossibleSets]; 
 }
 
 - (void)setFlipsCount:(int)flipsCount
@@ -210,6 +216,7 @@
             break; 
         }
     }
+    [self viewWillAppear:YES];
 }
 
 
