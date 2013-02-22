@@ -14,6 +14,7 @@
 @property (readwrite, nonatomic) int score;
 @property (nonatomic, strong) NSMutableArray *cards; // of Card
 @property (nonatomic, strong) Deck *currentDeck;
+@property (nonatomic, strong) NSMutableArray *possibleSets; // in Play
 
 // Flip count keeps track of remaining flips
 @property (nonatomic) int flipsRemaining;
@@ -50,8 +51,27 @@
             for (int otherCard2Index = otherCard1Index + 1; otherCard2Index <= [self.cards count]-1; otherCard2Index++) {
                 int match = [[self cardAtIndex:cardIndex] match:@[[self cardAtIndex:otherCard1Index], [self cardAtIndex:otherCard2Index]]];
                 if (match != 0){
-                    NSLog(@"SET FOUND");
-                    NSLog(@"Card: %@, Other1: %@, Other2: %@", [self cardAtIndex:cardIndex].contents,[self cardAtIndex:otherCard1Index].contents,[self cardAtIndex:otherCard2Index].contents);
+                    if ([self.possibleSets count] == 0) {
+                        [self.possibleSets addObject:[self cardAtIndex:cardIndex]];
+                        [self.possibleSets addObject:[self cardAtIndex:otherCard1Index]];
+                        [self.possibleSets addObject:[self cardAtIndex:otherCard2Index]];
+                        NSLog(@"FIRST SET FOUND");
+                        NSLog(@"Card: %@, Other1: %@, Other2: %@", [self cardAtIndex:cardIndex].contents,[self cardAtIndex:otherCard1Index].contents,[self cardAtIndex:otherCard2Index].contents);
+                    }
+                    else{
+                        for (Card *card in self.possibleSets) {
+                            if ([card.contents isEqualToString:[self cardAtIndex:cardIndex].contents] ||
+                                [card.contents isEqualToString:[self cardAtIndex:otherCard1Index].contents] ||
+                                [card.contents isEqualToString:[self cardAtIndex:otherCard2Index].contents]) {
+                                NSLog(@"Set can't be added.");
+                                break; 
+                            }else{
+                                NSLog(@"SET FOUND");
+                                NSLog(@"Card: %@, Other1: %@, Other2: %@", [self cardAtIndex:cardIndex].contents,[self cardAtIndex:otherCard1Index].contents,[self cardAtIndex:otherCard2Index].contents);
+                            }
+                        }
+                        
+                    }
                 }
             }
         }
@@ -64,6 +84,14 @@
         _cards = [[NSMutableArray alloc] init];
     }
     return _cards;
+}
+
+- (NSMutableArray *)possibleSets
+{
+    if (!_possibleSets) {
+        _possibleSets = [[NSMutableArray alloc] init];
+    }
+    return _possibleSets;
 }
 
 - (NSMutableArray *)holdCardsForMatching
